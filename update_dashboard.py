@@ -3,7 +3,7 @@ import json
 import logging
 from pathlib import Path
 
-BASE_DIR = Path('Phase 1/WCDashboard')
+BASE_DIR = Path(__file__).parent
 
 CACHE_DIR = BASE_DIR / "cache"
 LOG_DIR = BASE_DIR / "logs"
@@ -94,7 +94,7 @@ def generate_html():
 def write_html(html):
 
         html_file = INDEX_FILE
-        with open(INDEX_FILE, 'w') as f:
+        with open(html_file, 'w') as f:
                 f.write(html)
         print(f"Generated HTML file: {html_file}")
         
@@ -107,8 +107,15 @@ def main():
 
     initialize_log()
 
+    logging.info("Dashboard started successfully.")
+
     html = generate_html()
+
+    logging.info("HTML file created successfully.")
 
     write_html(html)
 
-    print("Dashboard generated successfully.")
+    print("Dashboard generated successfully.") 
+
+if __name__ == "__main__":
+    main()
