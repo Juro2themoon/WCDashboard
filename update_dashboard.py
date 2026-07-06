@@ -114,6 +114,22 @@ def fetch_matches():
     except Exception as error:
         logging.exception("Failed to fetch match data: %s", error)
         return None        
+    
+def parse_matches(data):
+    matches = []
+    events = data.get("events", [])
+
+    for event in events:
+
+        match = {
+            "id": event.get("id"),
+            "kickoff": event.get("date"),
+            "status": event.get("status", {}).get("type", {}).get("description"),
+            "venue": event.get("venue", {}).get("fullName")
+            }
+        matches.append(match)
+
+    return matches
 
 def main():
 
@@ -127,8 +143,12 @@ def main():
 
     if matches:
         print("Download successful!")
-        print(type(matches))
-        print(matches.keys())
+        parsed_matches = parse_matches(matches)
+
+        print("\nParsed matches:")
+
+        for match in parsed_matches:
+            print(match)
     else:
         print("Failed to download data.")
 
