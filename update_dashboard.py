@@ -2,6 +2,7 @@ import os
 import json
 import logging
 from pathlib import Path
+import urllib.request
 
 BASE_DIR = Path(__file__).parent
 
@@ -97,7 +98,22 @@ def write_html(html):
         with open(html_file, 'w') as f:
                 f.write(html)
         print(f"Generated HTML file: {html_file}")
-        
+
+
+ESPN_URL = (
+     "https://site.api.espn.com/apis/site/v2/sports/"
+    "soccer/fifa.world/scoreboard"
+)
+
+def fetch_matches():
+     
+    try:
+          with urllib.request.urlopen(ESPN_URL, timeout=10) as response:
+               return json.load(response)
+
+    except Exception as error:
+        logging.exception("Failed to fetch match data: %s", error)
+        return None        
 
 def main():
 
@@ -106,6 +122,15 @@ def main():
     initialize_state()
 
     initialize_log()
+
+    matches = fetch_matches()
+
+    if matches:
+        print("Download successful!")
+        print(type(matches))
+        print(matches.keys())
+    else:
+        print("Failed to download data.")
 
     logging.info("Dashboard started successfully.")
 
