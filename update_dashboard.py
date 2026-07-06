@@ -3,6 +3,7 @@ import json
 import logging
 from pathlib import Path
 import urllib.request
+from datetime import datetime, timezone
 
 BASE_DIR = Path(__file__).parent
 
@@ -122,16 +123,56 @@ def parse_matches(data):
 
     for event in events:
 
+        competition = event.get("competitions", [{}])[0]
+
+        competitors = competition.get("competitors", [])
+
+        home = {}
+        away = {}
+
+        for competitor in competitors:
+
+            if competitor.get("homeAway") == "home":
+                home = competitor
+
+            elif competitor.get("homeAway") == "away":
+                away = competitor
+
         match = {
             "id": event.get("id"),
             "kickoff": event.get("date"),
-            "status": event.get("status", {}).get("type", {}).get("description"),
-            "venue": event.get("venue", {}).get("fullName")
-            }
+            "status": competition.get("status", {})
+                        .get("type", {})
+                        .get("description"),
+
+            "venue": competition.get("venue", {})
+                        .get("fullName"),
+
+            "home_team": home.get("team", {})
+                     .get("displayName"),
+
+            "away_team": away.get("team", {})
+                     .get("displayName"),
+
+            "home_score": home.get("score"),
+
+            "away_score": away.get("score"),
+        }
         matches.append(match)
 
     return matches
 
+def save_state(matches):
+
+    state = {
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "data": matches
+        }
+    
+    with STATE_FILE.open('w') as file:
+        json.dump(state, file, indent=4)
+
+    logging.info("Saved %d matches to state file.", len(matches))
 
 def main():
 
@@ -145,11 +186,18 @@ def main():
 
     if matches:
         print("Download successful!")
-        
-        print(json.dumps(matches["events"][0], indent=4))
-        
+
+        parsed_matches = parse_matches(matches)
+
+        save_state(parsed_matches)
+
+        print("\nParsed matches:")
+
+        for match in parsed_matches:
+            print(match)
     else:
         print("Failed to download data.")
+
 
     logging.info("Dashboard started successfully.")
 
