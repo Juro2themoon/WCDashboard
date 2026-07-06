@@ -105,6 +105,7 @@ ESPN_URL = (
     "soccer/fifa.world/scoreboard"
 )
 
+
 def fetch_matches():
      
     try:
@@ -131,6 +132,7 @@ def parse_matches(data):
 
     return matches
 
+
 def main():
 
     ensure_directories()
@@ -143,12 +145,9 @@ def main():
 
     if matches:
         print("Download successful!")
-        parsed_matches = parse_matches(matches)
-
-        print("\nParsed matches:")
-
-        for match in parsed_matches:
-            print(match)
+        
+        print(json.dumps(matches["events"][0], indent=4))
+        
     else:
         print("Failed to download data.")
 
