@@ -158,6 +158,26 @@ def parse_matches(data):
 
             "away_score": away.get("score"),
         }
+
+        required_fields = [
+            "id",
+            "kickoff",
+            "home_team",
+            "away_team"
+        ]
+
+        missing = [
+            field for field in required_fields if not match.get(field)
+        ]
+
+        if missing:
+            logging.warning(
+                "Skipping incomplete match. Missing fields: %s",
+                ", ".join(missing)
+            
+            )
+            continue
+        
         matches.append(match)
 
     return matches
