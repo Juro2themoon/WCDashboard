@@ -197,7 +197,7 @@ def save_state(matches):
 def load_state():
 
     try:
-        with STATE_FILE,open("r", encoding="utf-8") as file:
+        with STATE_FILE.open("r", encoding="utf-8") as file:
             return json.load(file)
     
     except FileNotFoundError:
