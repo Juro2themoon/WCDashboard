@@ -177,7 +177,7 @@ def parse_matches(data):
             
             )
             continue
-        
+
         matches.append(match)
 
     return matches
@@ -193,6 +193,20 @@ def save_state(matches):
         json.dump(state, file, indent=4)
 
     logging.info("Saved %d matches to state file.", len(matches))
+
+def load_state():
+
+    try:
+        with STATE_FILE,open("r", encoding="utf-8") as file:
+            return json.load(file)
+    
+    except FileNotFoundError:
+        logging.warning("State file not found. Returning empty state.")
+        return {"last_updated": None, "data": []}
+    
+    except json.JSONDecodeError:
+        logging.error("State file is corrupted. Returning empty state.")
+        return {"last_updated": None, "data": []}
 
 def main():
 
@@ -210,6 +224,10 @@ def main():
         parsed_matches = parse_matches(matches)
 
         save_state(parsed_matches)
+
+        state = load_state()
+
+        print(state)
 
         print("\nParsed matches:")
 
