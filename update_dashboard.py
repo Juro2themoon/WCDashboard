@@ -57,14 +57,9 @@ def initialize_log():
 
     logging.basicConfig(filename=log_file, level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
-    
-def generate_html(matches):
 
-
-    match_cards = ""
-
-    for match in matches:
-        match_cards += f"""
+def generate_match_card(match):
+    return f"""
         <div class="match-card">
             <h2>{match.get("home_team", "Unknown")} vs {match.get("away_team", "Unknown")}</h2>
 
@@ -77,6 +72,13 @@ def generate_html(matches):
             <p><strong>Venue:</strong> {match.get("venue", "Unknown")}</p>
         </div>
         """
+
+def generate_html(matches):
+
+    match_cards = ""
+
+    for match in matches:
+        match_cards += generate_match_card(match)
 
     html = f"""
     <!DOCTYPE html>
