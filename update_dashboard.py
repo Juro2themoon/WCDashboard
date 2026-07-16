@@ -58,9 +58,27 @@ def initialize_log():
     logging.basicConfig(filename=log_file, level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
     
-def generate_html():
+def generate_html(matches):
 
-    html = """
+
+    match_cards = ""
+
+    for match in matches:
+        match_cards += f"""
+        <div class="match-card">
+            <h2>{match.get("home_team", "Unknown")} vs {match.get("away_team", "Unknown")}</h2>
+
+            <p><strong>Score:</strong> {match.get("home_score", "-")} - {match.get("away_score", "-")}</p>
+
+            <p><strong>Status:</strong> {match.get("status", "Unknown")}</p>
+
+            <p><strong>Kickoff:</strong> {match.get("kickoff", "Unknown")}</p>
+
+            <p><strong>Venue:</strong> {match.get("venue", "Unknown")}</p>
+        </div>
+        """
+
+    html = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -76,7 +94,9 @@ def generate_html():
             <section id="data-section">
                 <h2>Data Overview</h2>
                 <div id="data-container">
-                    <!-- Data will be dynamically inserted here -->
+
+                    {match_cards}
+
                 </div>
             </section>
             <section id="update-section">
@@ -239,7 +259,7 @@ def main():
 
     logging.info("Dashboard started successfully.")
 
-    html = generate_html()
+    html = generate_html(state["data"])
 
     logging.info("HTML file created successfully.")
 
