@@ -60,18 +60,26 @@ def initialize_log():
 
 def generate_match_card(match):
     return f"""
-        <div class="match-card">
-            <h2>{match.get("home_team", "Unknown")} vs {match.get("away_team", "Unknown")}</h2>
+    <div class="match-card">
 
-            <p><strong>Score:</strong> {match.get("home_score", "-")} - {match.get("away_score", "-")}</p>
+        <div class="teams">
+            <span>{match.get("home_team", "Unknown")}</span>
 
+            <strong class="score">
+                {match.get("home_score", "-")} - {match.get("away_score", "-")}
+            </strong>
+
+            <span>{match.get("away_team", "Unknown")}</span>
+        </div>
+
+        <div class="details">
             <p><strong>Status:</strong> {match.get("status", "Unknown")}</p>
-
             <p><strong>Kickoff:</strong> {match.get("kickoff", "Unknown")}</p>
-
             <p><strong>Venue:</strong> {match.get("venue", "Unknown")}</p>
         </div>
-        """
+
+    </div>
+    """
 
 def generate_html(matches):
 
@@ -115,6 +123,22 @@ def generate_html(matches):
 
             .match-card h2 {{
                 margin-top: 0;
+            }}
+
+            .teams {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 22px;
+                margin-bottom: 20px;
+            }}
+
+            .score {{
+                font-size: 30px;
+            }}
+
+            .details p {{
+                margin: 6px 0;
             }}
         </style>
     </head>
