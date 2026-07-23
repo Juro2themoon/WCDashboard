@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 import urllib.request
 from datetime import datetime, timezone
+import hashlib
 
 BASE_DIR = Path(__file__).parent
 
@@ -15,6 +16,8 @@ BACKUP_DIR = BASE_DIR / "backups"
 STATE_FILE = STATE_DIR / "state.json"
 LOG_FILE = LOG_DIR / "update.log"
 INDEX_FILE = BASE_DIR / "index.html"
+
+HTML_HASH_FILE = BASE_DIR / "state" / "html_hash"
 
 def ensure_directories():
 
@@ -169,6 +172,21 @@ def generate_html(matches):
 
     return html
 
+def calculate_html_hash(html):
+    return hashlib.md5(html.encode('utf-8')).hexdigest()
+
+def load_html_hash():
+
+    try:
+        return HTML_HASH_FILE.read_text(encoding="utf-8").strip()
+    
+    except FileNotFoundError:
+        return None
+    
+def save_html_hash(html_hash):
+
+    HTML_HASH_FILE.write_text(html_hash, encoding="utf-8")
+
 def write_html(html):
 
         html_file = INDEX_FILE
@@ -316,6 +334,12 @@ def main():
     logging.info("Dashboard started successfully.")
 
     html = generate_html(state["data"])
+
+    html_hash = calculate_html_hash(html)
+
+    save_html_hash(html_hash)
+
+    print(load_html_hash())
 
     logging.info("HTML file created successfully.")
 
