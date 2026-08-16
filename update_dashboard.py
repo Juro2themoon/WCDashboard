@@ -16,6 +16,7 @@ BACKUP_DIR = BASE_DIR / "backups"
 STATE_FILE = STATE_DIR / "state.json"
 LOG_FILE = LOG_DIR / "update.log"
 INDEX_FILE = BASE_DIR / "index.html"
+CACHE_FILE = CACHE_DIR / "latest_response.json"
 
 
 HTML_HASH_FILE = BASE_DIR / "state" / "html_hash"
@@ -220,16 +221,69 @@ ESPN_URL = (
     "soccer/fifa.world/scoreboard"
 )
 
+def save_cache(data):
+
+    with CACHE_FILE.open("w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+
+    logging.info("Saved API response to cache.")
+
+
+def load_cache():
+
+    try:
+
+        with CACHE_FILE.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        logging.info("Loaded data from cache.")
+
+        return data
+
+    except FileNotFoundError:
+
+        logging.warning("Cache file not found.")
+
+        return None
+
+    except json.JSONDecodeError:
+
+        logging.error("Cache file is corrupted.")
+
+        return None
+
+
 
 def fetch_matches():
      
     try:
-          with urllib.request.urlopen(ESPN_URL, timeout=10) as response:
-               return json.load(response)
+        with urllib.request.urlopen(ESPN_URL, timeout=10) as response:
+
+            data = json.load(response)
+
+        save_cache(data)
+
+        logging.info("Successfully fetched fresh match data.")
+
+        return data
 
     except Exception as error:
+
         logging.exception("Failed to fetch match data: %s", error)
-        return None        
+
+        logging.info("Attempting to load cached API response.")
+
+        cached_data = load_cache()
+
+        if cached_data is not None:
+
+            logging.info("Using cached API response.")
+
+            return cached_data
+
+        logging.error("No cached data available.")
+
+        return None
     
 def parse_matches(data):
     matches = []
