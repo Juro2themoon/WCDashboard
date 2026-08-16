@@ -9,7 +9,7 @@ The project was built to develop practical experience with **REST APIs, JSON pro
 I was watching the world cup and thought, "i would like to see what world cup fixtures are on today" and then i dawned on me... I can make that!
 I also wanted to develop some practical experience building an application using an external APi. I wanted to understand the underlying processes involved instead of using a framework.
 
-Unfortunately the world cup came to an end before i could implement every feature that i wanted to. Fortunately i am satrting a new project,and i decided to use this project as a foundation for it: *A Premier league Dashboard* . i will use this project to refine my skills and add all my preferred features e.g league table and stats.
+Unfortunately the world cup came to an end before i could implement every feature that i wanted to. Fortunately i am satrting a new project,and i decided to use this project as a foundation for it: **A Premier league Dashboard** . i will use this project to refine my skills and add all my preferred features e.g league table and stats.
 
 ## Features
 
