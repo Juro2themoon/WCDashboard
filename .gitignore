@@ -8,3 +8,13 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+.idea/
+*.iml
+__pycache__/
+*.pyc
+.env
+.DS_Store
+
+logs/*
+cache/*
+backups/*
