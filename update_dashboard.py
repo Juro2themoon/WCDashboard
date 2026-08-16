@@ -33,9 +33,9 @@ def ensure_directories():
     for directory in directories:
         if not directory.exists():
             directory.mkdir(parents=True, exist_ok=True)
-            print(f"Created directory: {directory}")
+            logging.info(f"Created directory: {directory}")
         else:
-            print(f"Directory already exists: {directory}")
+            logging.info(f"Directory already exists: {directory}")
 
 def initialize_state():
 
@@ -45,20 +45,20 @@ def initialize_state():
             "last_updated": None,
             "data": {}
         }
-        with open(state_file, 'w') as f:
+        with open(state_file, 'w', encoding='utf-8') as f:
             json.dump(initial_state, f, indent=4)
-        print(f"Initialized state file: {state_file}")
+        logging.info(f"Initialized state file: {state_file}")
     else:
-        print(f"State file already exists: {state_file}")
+        logging.info(f"State file already exists: {state_file}")
 
 def initialize_log():
 
     log_file = LOG_FILE
     if not log_file.exists():
         log_file.touch()
-        print(f"Created log file: {log_file}")
+        logging.info(f"Created log file: {log_file}")
     else:
-        print(f"Log file already exists: {log_file}")
+        logging.info(f"Log file already exists: {log_file}")
 
     logging.basicConfig(filename=log_file, level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
@@ -177,13 +177,13 @@ def generate_html(matches):
 def write_html(html):
 
         html_file = INDEX_FILE
-        with open(html_file, 'w') as f:
+        with open(html_file, 'w', encoding='utf-8') as f:
                 f.write(html)
-        print(f"Generated HTML file: {html_file}")
+        logging.info(f"Generated HTML file: {html_file}")
 
 
 def calculate_html_hash(html):
-    return hashlib.md5(html.encode("utf-8")).hexdigest()
+    return hashlib.sha256(html.encode("utf-8")).hexdigest()
 
 
 def load_html_hash():
