@@ -352,12 +352,14 @@ def parse_matches(data):
 
 def save_state(matches):
 
+    backup_state()
+
     state = {
         "last_updated": datetime.now(timezone.utc).isoformat(),
         "data": matches
         }
     
-    with STATE_FILE.open('w') as file:
+    with STATE_FILE.open('w', encoding='utf-8') as file:
         json.dump(state, file, indent=4)
 
     logging.info("Saved %d matches to state file.", len(matches))
@@ -376,6 +378,28 @@ def load_state():
         logging.error("State file is corrupted. Returning empty state.")
         return {"last_updated": None, "data": []}
 
+def backup_state():
+
+    if not STATE_FILE.exists():
+
+        logging.info("No existing state file to backup.")
+
+        return
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+    backup_file = BACKUP_DIR / f"state_{timestamp}.json"
+
+    with STATE_FILE.open("r", encoding="utf-8") as source:
+
+        data = source.read()
+
+    with backup_file.open("w", encoding="utf-8") as destination:
+
+        destination.write(data)
+
+    logging.info("Created state backup: %s", backup_file)
+
 def main():
 
     ensure_directories()
@@ -387,7 +411,6 @@ def main():
     matches = fetch_matches()
 
     if matches:
-        print("Download successful!")
 
         parsed_matches = parse_matches(matches)
 
@@ -395,14 +418,10 @@ def main():
 
         state = load_state()
 
-        print(state)
-
-        print("\nParsed matches:")
-
-        for match in parsed_matches:
-            print(match)
     else:
-        print("Failed to download data.")
+        logging.error("No match data available. Using last known state.")
+
+        state = load_state()
 
 
     logging.info("Dashboard started successfully.")
@@ -419,13 +438,13 @@ def main():
 
         logging.info("Dashboard HTML updated.")
 
-        print("Dashboard generated successfully.")
+        logging.info("Dashboard generated successfully.")
 
     else:
 
         logging.info("Dashboard HTML unchanged. No update required.")
 
-        print("Dashboard unchanged. No update required.")
+        logging.info("Dashboard unchanged. No update required.")
 
 if __name__ == "__main__":
     main()
