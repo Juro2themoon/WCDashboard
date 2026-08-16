@@ -17,6 +17,7 @@ STATE_FILE = STATE_DIR / "state.json"
 LOG_FILE = LOG_DIR / "update.log"
 INDEX_FILE = BASE_DIR / "index.html"
 
+
 HTML_HASH_FILE = BASE_DIR / "state" / "html_hash"
 
 def ensure_directories():
@@ -172,27 +173,46 @@ def generate_html(matches):
 
     return html
 
-def calculate_html_hash(html):
-    return hashlib.md5(html.encode('utf-8')).hexdigest()
-
-def load_html_hash():
-
-    try:
-        return HTML_HASH_FILE.read_text(encoding="utf-8").strip()
-    
-    except FileNotFoundError:
-        return None
-    
-def save_html_hash(html_hash):
-
-    HTML_HASH_FILE.write_text(html_hash, encoding="utf-8")
-
 def write_html(html):
 
         html_file = INDEX_FILE
         with open(html_file, 'w') as f:
                 f.write(html)
         print(f"Generated HTML file: {html_file}")
+
+
+def calculate_html_hash(html):
+    return hashlib.md5(html.encode("utf-8")).hexdigest()
+
+
+def load_html_hash():
+
+    try:
+        return HTML_HASH_FILE.read_text(encoding="utf-8").strip()
+
+    except FileNotFoundError:
+        return None
+
+
+def save_html_hash(html_hash):
+    HTML_HASH_FILE.write_text(html_hash, encoding="utf-8")
+
+
+def html_has_changed(new_html_hash):
+
+    previous_hash = load_html_hash()
+
+    if previous_hash is None:
+        logging.info("No previous HTML hash found. HTML will be generated.")
+        return True
+
+    if previous_hash != new_html_hash:
+        logging.info("HTML content has changed.")
+        return True
+
+    logging.info("HTML content has not changed.")
+    return False
+    
 
 
 ESPN_URL = (
@@ -335,17 +355,23 @@ def main():
 
     html = generate_html(state["data"])
 
-    html_hash = calculate_html_hash(html)
+    new_html_hash = calculate_html_hash(html)
 
-    save_html_hash(html_hash)
+    if html_has_changed(new_html_hash):
 
-    print(load_html_hash())
+        write_html(html)
 
-    logging.info("HTML file created successfully.")
+        save_html_hash(new_html_hash)
 
-    write_html(html)
+        logging.info("Dashboard HTML updated.")
 
-    print("Dashboard generated successfully.") 
+        print("Dashboard generated successfully.")
+
+    else:
+
+        logging.info("Dashboard HTML unchanged. No update required.")
+
+        print("Dashboard unchanged. No update required.")
 
 if __name__ == "__main__":
     main()
